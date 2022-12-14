@@ -19,7 +19,7 @@ let areas = 4;
 
 function setup() {
   
-  createCanvas(boxsize, boxsize);
+  createCanvas(boxsize+20, boxsize+20);
   
   
   
@@ -29,7 +29,7 @@ function setup() {
     
     posPoints[i] = createVector(10+(boxsize/areas*i),boxsize/2);
     
-    controlPoints[i] =createVector(i*10,i*10);
+    controlPoints[i] =createVector(i*100,i*20+200);
     
   }
   //alert("setup")
@@ -44,27 +44,23 @@ function ad(v0,v1){
   return p5.Vector.add(v0,v1)
 }
 
-function mouseClicked() {
-    
+function mouseClicked() {    
   currentPoint = (currentPoint+1)%controlPoints.length;
 }
 
 function draw() {
   background(50);
   noFill();
-   strokeWeight(1);
+  strokeWeight(1);
   text(currentPoint+": "+controlPoints[1].x, 25,25);
   
   if(mouseY<boxsize && mouseY>=10){
-     controlPoints[currentPoint] = createVector(mouseX,mouseY);
-    //console.log(controlPoints[1].x, "mouse on")
-         
+     controlPoints[currentPoint] = createVector(mouseX,mouseY);         
   }
   else{
-    // c0 = createVector(120,100);
-    // c1 = createVector(boxsize/2-c0.x,boxsize-c0.y);
-    // c2 = createVector(boxsize-30,boxsize-100);
-    //console.log(controlPoints[1].x, "mouse off")
+     for(let i = 0; i<areas+1;i++){ 
+        controlPoints[i] =createVector(i*100,i*20+200);    
+     }
     
   }
     
@@ -95,11 +91,16 @@ function draw() {
   
 }
 
-function beziLocked(pp1,cc1, cc2, pp2, locked = true){
+function beziLocked(pp1,cc1, cc2, pp2, locked = true, helper = true){
    let ll1 = locked ? cc1.copy().sub(pp1).mult(-1).add(pp1) : cc1
   strokeWeight(1);
   text("locked", ll1.x+10, ll1.y-10)
+  line(pp1.x, pp1.y, ll1.x, ll1.y)
   beziAbsolute(pp1,ll1,cc2,pp2);
+  
+  strokeWeight(1);
+  line(pp2.x, pp2.y, cc2.x, cc2.y)
+  
 }
 
 function beziAbsolute(p0, c0, c1, p1){
