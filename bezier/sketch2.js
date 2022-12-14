@@ -11,25 +11,28 @@ let p0,p1,p2,p3;
 
 let valueX=0, valueY=0;
 
+let posPoints = [];
 let controlPoints = [];
 let currentPoint = 0;
 
+let areas = 7;
 
 function setup() {
   
   createCanvas(boxsize, boxsize);
-  p0 = createVector(10,boxsize/2);
-  p1 = createVector(boxsize/2,boxsize/2);  
-  p2 = createVector(boxsize-10,boxsize/2);
+  
+  
+  
  
-  controlPoints = [
-  createVector(10,10), 
-  createVector(20,20), 
-  createVector(30,30)
-]
-
-  
-  
+ 
+  for(let i = 0; i<areas;i++){ 
+    
+    posPoints[i] = createVector(10+(boxsize/areas*i),boxsize/2);
+    
+    controlPoints[i] =createVector(i*10,i*10);
+    
+  }
+  //alert("setup")
   colorMode(HSB);
   //draw2();
 }
@@ -50,50 +53,48 @@ function draw() {
   background(50);
   noFill();
    strokeWeight(1);
-  text(currentPoint, 20,20);
+  text(currentPoint+": "+controlPoints[1].x, 25,25);
   
   if(mouseY<boxsize && mouseY>=10){
      controlPoints[currentPoint] = createVector(mouseX,mouseY);
-    c0 = controlPoints[0];
-    c1 = controlPoints[1];
-    c2 = controlPoints[2];
+    //console.log(controlPoints[1].x, "mouse on")
          
   }
   else{
-     c0 = createVector(120,100);
-     c1 = createVector(boxsize/2-c0.x,boxsize-c0.y);
-     c2 = createVector(boxsize-30,boxsize-100);
+    // c0 = createVector(120,100);
+    // c1 = createVector(boxsize/2-c0.x,boxsize-c0.y);
+    // c2 = createVector(boxsize-30,boxsize-100);
+    //console.log(controlPoints[1].x, "mouse off")
+    
   }
     
   stroke(0, 255, 255);
-   dotti(p0);
+ //  dotti(p0);
 //   dotti(c0);
   
-   dotti(p1);
+ //  dotti(p1);
 //   dotti(c1);
   
-   dotti(p2);
+ //  dotti(p2);
 // dotti(c2);
   
-   strokeWeight(3);
+   strokeWeight(3); 
   
-  
-  
-stroke(100, 255, 255);
-  beziAbsolute(p0,c0,c1,p1);  
+  stroke(100, 255, 255);
+  beziAbsolute(posPoints[0],controlPoints[0],controlPoints[1],posPoints[1]);  
   stroke(200, 255, 255);
-  //locked c1
-  
-  
-  beziLocked(p1,c1, c2, p2)
+    for(let i = 1; i<areas-1;i++){ 
+      stroke(i*50, 255, 255);   
+  beziLocked(posPoints[i],controlPoints[i],controlPoints[i+1],posPoints[i+1])
+    }
   
 }
 
-function beziLocked(p1,c1, c2, p2){
-    l1 = c1.sub(p1).mult(-1).add(p1)
+function beziLocked(pp1,cc1, cc2, pp2){
+   let ll1 = cc1.copy().sub(pp1).mult(-1).add(pp1)
   strokeWeight(1);
-  text("locked", l1.x+10, l1.y-10)
-  beziAbsolute(p1,l1,c2,p2);
+  text("locked", ll1.x+10, ll1.y-10)
+  beziAbsolute(pp1,ll1,cc2,pp2);
 }
 
 function beziAbsolute(p0, c0, c1, p1){
