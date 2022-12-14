@@ -7,74 +7,130 @@ let timer = 0.0000001;
 
 let showlert1 = false;
 
+let p0,p1,p2,p3;
+
+let valueX=0, valueY=0;
+
+let controlPoints = [];
+let currentPoint = 0;
+
 
 function setup() {
   
   createCanvas(boxsize, boxsize);
   p0 = createVector(10,boxsize/2);
-  p1 = createVector(150,100);
-  p2 = createVector(boxsize-p1.x,boxsize-p1.y);
-  p3 = createVector(boxsize-10,boxsize/2);
+  p1 = createVector(boxsize/2,boxsize/2);  
+  p2 = createVector(boxsize-10,boxsize/2);
+ 
+  controlPoints = [
+  createVector(10,10), 
+  createVector(20,20), 
+  createVector(30,30)
+]
+
+  
   
   colorMode(HSB);
+  //draw2();
+}
+
+function mu(v0,v1){
+  return p5.Vector.mult(v0,v1)
+}
+function ad(v0,v1){
+  return p5.Vector.add(v0,v1)
+}
+
+function mouseClicked() {
+    
+  currentPoint = (currentPoint+1)%controlPoints.length;
 }
 
 function draw() {
-  if(mouseY<boxsize && mouseY>=10){
-     p1 = createVector(mouseX,mouseY);
-     p2 = createVector(boxsize-p1.x,boxsize-p1.y);
-    
-  }
-  else{
-     p1 = createVector(150,100);
-    p2 = createVector(boxsize-p1.x,boxsize-p1.y);
-  }
-  
-  
   background(50);
   noFill();
-  dotti(p0);
-  dotti(p1);
-  dotti(p2);
-  dotti(p3);
+   strokeWeight(1);
+  text(currentPoint, 20,20);
+  
+  if(mouseY<boxsize && mouseY>=10){
+     controlPoints[currentPoint] = createVector(mouseX,mouseY);
+    c0 = controlPoints[0];
+    c1 = controlPoints[1];
+    c2 = controlPoints[2];
+         
+  }
+  else{
+     c0 = createVector(120,100);
+     c1 = createVector(boxsize/2-c0.x,boxsize-c0.y);
+     c2 = createVector(boxsize-30,boxsize-100);
+  }
+    
+  stroke(0, 255, 255);
+   dotti(p0);
+//   dotti(c0);
+  
+   dotti(p1);
+//   dotti(c1);
+  
+   dotti(p2);
+// dotti(c2);
+  
    strokeWeight(3);
- // text("haha", p2.x+2,p2.y+2);
-  stroke(255, 102, 0);
-  strokeWeight(2);
-  //line(p0.x,p0.y,p1.x,p1.y);
-  //line(p2.x,p2.y,p3.x,p3.y);
-  //stroke(100, 0, 0);
-  //bezier(p0.x,p0.y,p1.x,p1.y, p2.x,p2.y,p3.x,p3.y);
+  
+  
+  
+stroke(100, 255, 255);
+  beziAbsolute(p0,c0,c1,p1);  
+  stroke(200, 255, 255);
+  //locked c1
+  
+  
+  beziLocked(p1,c1, c2, p2)
+  
+}
 
+function beziLocked(p1,c1, c2, p2){
+    l1 = c1.sub(p1).mult(-1).add(p1)
+  strokeWeight(1);
+  text("locked", l1.x+10, l1.y-10)
+  beziAbsolute(p1,l1,c2,p2);
+}
+
+function beziAbsolute(p0, c0, c1, p1){
+  
+   dotti(p0);
+   dotti(c0);
+   dotti(p1);
+   dotti(c1);
+  
   timer += colorSpeed;
-  for(t=0; t<=1-stepSize;t+=stepSize){
+  let temp = p0;
+  for(t=0; t<=1.000001;t+=stepSize){    
     
-        
-    let t1 = t;
-    let t2 = t*t;
-    let t3 = t*t*t;
+    //stroke((t * 360+timer)%360, 255, 255);
+       
+    const t1 = t;
+    const t2 = t*t;
+    const t3 = t*t*t;
     
- //   let p = p0 + 
- //       t1*(-3*p0 + 3*p1) + 
- //       t2*(3*p0 + 6*p1+ 3*p3) + 
- //       t3*(-1*p0 + 3*p1+ -3*p2 + p3) 
+    const term1 = mu(ad(   mu(p0,-3), mu(c0,3)),t1);
+    const term2 = mu(ad(   mu(p0, 3), ad(mu(c0,-6), mu(c1,3))),t2)   
+    const term3 = mu(ad(ad(mu(p0,-1), mu(c0,3)), ad(mu(c1,-3),mu(p1,1))), t3)
     
-    let term1 = (p0.mult(-3).add(p1.mult(3))).mult(t1)
-    let term2 = (p0.mult(3).add(p1.mult(6)).add(p2.mult(3))).mult(t2)
-    let term3 = (p0.mult(-1).add(p1.mult(3)).add(p2.mult(-3)).add(p3)).mult(t3)
+    const p = ad(ad(p0, term1),ad( term2, term3))
     
-    let p = p0.add(term1).add(term2).add(term3);
-    //console.log(p);
+    const debug = false;
+    if(debug){
+      console.log(t)
+      console.log(p0.x, "p0")
+      console.log(term1.x, "term1")
+      console.log(term2.x, "term2")
+      console.log(term3.x, "term3")
+      console.log(p.x, p.y, "final p");
+    }
     
-    dotti(p,3)
-    
-    stroke((t * 360+timer)%360, 255, 255);
-    // line(t1.x, t1.y, t2.x, t2.y);
-    
-    //let mix = t1.add(t2);
-    // console.log(mix)
-    
-    // dotti(mix, 3);
+    line(temp.x, temp.y, p.x, p.y);    
+    temp = p;
   }
 }
 
@@ -124,6 +180,6 @@ function dotti(v,lvl){
   }
  
   
-    strokeWeight(1); // Make the points 10
+    strokeWeight(8); // Make the points 10
   point(v.x, v.y);
 }
