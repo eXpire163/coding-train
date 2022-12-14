@@ -15,7 +15,7 @@ let posPoints = [];
 let controlPoints = [];
 let currentPoint = 0;
 
-let areas = 7;
+let areas = 4;
 
 function setup() {
   
@@ -25,7 +25,7 @@ function setup() {
   
  
  
-  for(let i = 0; i<areas;i++){ 
+  for(let i = 0; i<areas+1;i++){ 
     
     posPoints[i] = createVector(10+(boxsize/areas*i),boxsize/2);
     
@@ -80,18 +80,23 @@ function draw() {
   
    strokeWeight(3); 
   
-  stroke(100, 255, 255);
-  beziAbsolute(posPoints[0],controlPoints[0],controlPoints[1],posPoints[1]);  
+
   stroke(200, 255, 255);
-    for(let i = 1; i<areas-1;i++){ 
+    for(let i = 0; i<areas;i++){ 
       stroke(i*50, 255, 255);   
-  beziLocked(posPoints[i],controlPoints[i],controlPoints[i+1],posPoints[i+1])
+      beziLocked(
+        posPoints[i],
+        controlPoints[i],
+        controlPoints[i+1],
+        posPoints[i+1],
+        (i<areas)
+      )
     }
   
 }
 
-function beziLocked(pp1,cc1, cc2, pp2){
-   let ll1 = cc1.copy().sub(pp1).mult(-1).add(pp1)
+function beziLocked(pp1,cc1, cc2, pp2, locked = true){
+   let ll1 = locked ? cc1.copy().sub(pp1).mult(-1).add(pp1) : cc1
   strokeWeight(1);
   text("locked", ll1.x+10, ll1.y-10)
   beziAbsolute(pp1,ll1,cc2,pp2);
