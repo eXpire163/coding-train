@@ -20,10 +20,6 @@ let areas = 4;
 function setup() {
   
   createCanvas(boxsize+20, boxsize+20);
-  
-  
-  
- 
  
   for(let i = 0; i<areas+1;i++){ 
     
@@ -52,8 +48,9 @@ function draw() {
   background(50);
   noFill();
   strokeWeight(1);
-  text(currentPoint+": "+controlPoints[1].x, 25,25);
-  
+    for(let i = 0; i<areas+1;i++){ 
+       text(i+": "+controlPoints[i].x+" , "+controlPoints[i].y, 25,25*i+20);
+    }
   if(mouseY<boxsize && mouseY>=10){
      controlPoints[currentPoint] = createVector(mouseX,mouseY);         
   }
@@ -64,18 +61,6 @@ function draw() {
     
   }
     
-  stroke(0, 255, 255);
- //  dotti(p0);
-//   dotti(c0);
-  
- //  dotti(p1);
-//   dotti(c1);
-  
- //  dotti(p2);
-// dotti(c2);
-  
-   strokeWeight(3); 
-  
 
   stroke(200, 255, 255);
     for(let i = 0; i<areas;i++){ 
@@ -92,14 +77,14 @@ function draw() {
 }
 
 function beziLocked(pp1,cc1, cc2, pp2, locked = true, helper = true){
-   let ll1 = locked ? cc1.copy().sub(pp1).mult(-1).add(pp1) : cc1
+  //mirror to reach c1
+  let ll1 = locked  ? cc1.copy().sub(pp1).mult(-1).add(pp1) : cc1
   strokeWeight(1);
   text("locked", ll1.x+10, ll1.y-10)
-  line(pp1.x, pp1.y, ll1.x, ll1.y)
-  beziAbsolute(pp1,ll1,cc2,pp2);
+  line(pp1.x, pp1.y, ll1.x, ll1.y) // startline
+  line(pp2.x, pp2.y, cc2.x, cc2.y) // endline
   
-  strokeWeight(1);
-  line(pp2.x, pp2.y, cc2.x, cc2.y)
+  beziAbsolute(pp1,ll1,cc2,pp2);
   
 }
 
@@ -126,54 +111,15 @@ function beziAbsolute(p0, c0, c1, p1){
     
     const p = ad(ad(p0, term1),ad( term2, term3))
     
-    const debug = false;
-    if(debug){
-      console.log(t)
-      console.log(p0.x, "p0")
-      console.log(term1.x, "term1")
-      console.log(term2.x, "term2")
-      console.log(term3.x, "term3")
-      console.log(p.x, p.y, "final p");
-    }
-    
-    line(temp.x, temp.y, p.x, p.y);    
+
+    strokeWeight(5);
+    line(temp.x, temp.y, p.x, p.y);  
+    let magnetude = p.copy().sub(temp).mag();
+    strokeWeight(1);
+    line(p.x, p.y, p.x, p.y+magnetude)
     temp = p;
   }
 }
-
-function mylerp3d(p0, p1, p2, p3, t){
-  
-  let v0 = mylerp2d(p0, p1, p2, t);
-  let v1 = mylerp2d(p1, p2, p3, t);
-  
-  let v3 =  mylerp(v0, v1,t)  
-  // dotti(v3,3);
-  return v3
-  
-}
-
-function mylerp2d(p0, p1, p2, t){
-  
-  let v0 = mylerp(p0,p1,t);
-  let v1 = mylerp(p1,p2,t)
-  
-  let v2 = mylerp(v0, v1,t);
-  if(showlert1)
-    line(v0.x, v0.y, v1.x, v1.y);
-  return  v2;
-  
-}
-
-
-function mylerp(p0, p1, t){
-  let x = p0.x+t*(p1.x-p0.x);
-  let y = p0.y+t*(p1.y-p0.y);
-  
-  let v = new createVector(x,y);
-  // dotti(v, 0);
-  return v;
-}
-
 
 function dotti(v,lvl){
   if(lvl==0){
@@ -187,6 +133,6 @@ function dotti(v,lvl){
   }
  
   
-    strokeWeight(8); // Make the points 10
+  strokeWeight(8); // Make the points 10
   point(v.x, v.y);
 }
